@@ -1,0 +1,662 @@
+import pandas as pd
+import numpy as np
+
+# data visualization library
+import matplotlib
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set(context='notebook', style='darkgrid', palette='colorblind', font='sans-serif', font_scale=1, rc=None)
+matplotlib.rcParams['figure.figsize'] =[8,8]
+matplotlib.rcParams.update({'font.size': 15})
+matplotlib.rcParams['font.family'] = 'sans-serif'
+pip install dataprep
+from dataprep.eda import *
+from dataprep.eda.missing import plot_missing
+from dataprep.eda import plot_correlation
+covid = pd.read_csv('CovidDataset.csv')
+covid
+covid.info()
+covid.describe(include='all')
+  plot_missing(covid)
+# create a table with data missing
+missing_values=covid.isnull().sum() # missing values
+
+percent_missing = covid.isnull().sum()/covid.shape[0]*100 # missing value %
+
+value = {
+    'missing_values ':missing_values,
+    'percent_missing %':percent_missing
+}
+frame=pd.DataFrame(value)
+frame
+#data visualisation
+#covid 19 target
+sns.countplot(x='COVID-19',data=covid)
+  covid["COVID-19"].value_counts().plot.pie(explode=[0.1,0.1],autopct='%1.1f%%',shadow=True)
+plt.title('number of cases');
+#feature transformation
+from sklearn.preprocessing import LabelEncoder
+e=LabelEncoder()
+covid['Breathing Problem']=e.fit_transform(covid['Breathing Problem'])
+covid['Fever']=e.fit_transform(covid['Fever'])
+covid['Dry Cough']=e.fit_transform(covid['Dry Cough'])
+covid['Sore throat']=e.fit_transform(covid['Sore throat'])
+covid['Running Nose']=e.fit_transform(covid['Running Nose'])
+covid['Asthma']=e.fit_transform(covid['Asthma'])
+covid['Chronic Lung Disease']=e.fit_transform(covid['Chronic Lung Disease'])
+covid['Headache']=e.fit_transform(covid['Headache'])
+covid['Heart Disease']=e.fit_transform(covid['Heart Disease'])
+covid['Diabetes']=e.fit_transform(covid['Diabetes'])
+covid['Hyper Tension']=e.fit_transform(covid['Hyper Tension'])
+covid['Abroad travel']=e.fit_transform(covid['Abroad travel'])
+covid['Contact with COVID Patient']=e.fit_transform(covid['Contact with COVID Patient'])
+covid['Attended Large Gathering']=e.fit_transform(covid['Attended Large Gathering'])
+covid['Visited Public Exposed Places']=e.fit_transform(covid['Visited Public Exposed Places'])
+covid['Family working in Public Exposed Places']=e.fit_transform(covid['Family working in Public Exposed Places'])
+covid['Wearing Masks']=e.fit_transform(covid['Wearing Masks'])
+covid['Sanitization from Market']=e.fit_transform(covid['Sanitization from Market'])
+covid['COVID-19']=e.fit_transform(covid['COVID-19'])
+covid['Dry Cough']=e.fit_transform(covid['Dry Cough'])
+covid['Sore throat']=e.fit_transform(covid['Sore throat'])
+covid['Gastrointestinal ']=e.fit_transform(covid['Gastrointestinal '])
+covid['Fatigue ']=e.fit_transform(covid['Fatigue '])
+
+
+covid.head()
+
+
+covid.dtypes.value_counts()
+
+covid.hist(figsize=(20,15));
+
+#correlation between features
+
+plot_correlation(covid)
+
+corr=covid.corr()
+corr.style.background_gradient(cmap='coolwarm',axis=None)
+
+#FEATURE SELECTION
+
+#feature that we gonna delelte : Running Nose / Asthma /Chronic Lung Disease / Headache / Heart Disease / Diabetes / Fatigue / Gastrointestinal / Wearing Masks / Sanitization from Market
+
+covid=covid.drop('Running Nose',axis=1)
+covid=covid.drop('Chronic Lung Disease',axis=1)
+covid=covid.drop('Headache',axis=1)
+covid=covid.drop('Heart Disease',axis=1)
+covid=covid.drop('Diabetes',axis=1)
+covid=covid.drop('Gastrointestinal ',axis=1)
+covid=covid.drop('Wearing Masks',axis=1)
+covid=covid.drop('Sanitization from Market',axis=1)
+covid=covid.drop('Asthma',axis=1)
+
+corr=covid.corr()
+corr.style.background_gradient(cmap='coolwarm',axis=None)
+
+#ml algorithms
+
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.metrics import accuracy_score
+
+x=covid.drop('COVID-19',axis=1)
+y=covid['COVID-19']
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.20)
+
+#logistic regression
+from sklearn.linear_model import LogisticRegression
+model = LogisticRegression()
+#Fit the model
+model.fit(x_train, y_train)
+y_pred = model.predict(x_test)
+#Score/Accuracy
+acc_logreg=model.score(x_test, y_test)*100
+acc_logreg
+
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Assuming you have your data in a variable 'data'
+# Replace 'data' with your actual dataset
+
+# Create a K-Means model with a specified number of clusters (k)
+k = 3  # You can adjust the number of clusters as needed
+kmeans = KMeans(n_clusters=k)
+
+# Fit the model to your data
+kmeans.fit(data)
+
+# Get cluster labels
+cluster_labels = kmeans.labels_
+
+# Get cluster centroids
+cluster_centers = kmeans.cluster_centers_
+
+# Visualization (if your data is 2D)
+plt.scatter(data[:, 0], data[:, 1], c=cluster_labels, cmap='viridis')
+plt.scatter(cluster_centers[:, 0], cluster_centers[:, 1], c='red', marker='x', s=200)
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.title('K-Means Clustering')
+plt.show()
+
+from sklearn.linear_model import LogisticRegression
+
+# Assuming you've already trained your Logistic Regression model and made predictions (y_pred) on the test data
+# model is your Logistic Regression classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the accuracy
+accuracy = model.score(x_test, y_test)
+
+print("Accuracy:", accuracy)
+
+from sklearn.metrics import precision_score
+
+# Assuming you've already trained your Logistic Regression model and made predictions (y_pred) on the test data
+# model is your Logistic Regression classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the precision
+precision = precision_score(y_test, y_pred)
+
+print("Precision:", precision)
+
+from sklearn.metrics import precision_score
+
+# Assuming you've already trained your Logistic Regression model and made predictions (y_pred) on the test data
+# model is your Logistic Regression classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the precision
+precision = precision_score(y_test, y_pred)
+print("Precision :", precision)
+
+from sklearn.metrics import recall_score
+
+# Assuming you've already trained your Logistic Regression model and made predictions (y_pred) on the test data
+# model is your Logistic Regression classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the recall (sensitivity)
+recall = recall_score(y_test, y_pred)
+
+print("Recall (Sensitivity):", recall)
+
+from sklearn.metrics import f1_score
+
+# Assuming you've already trained your Logistic Regression model and made predictions (y_pred) on the test data
+# model is your Logistic Regression classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the F1-score
+f1_score_value = f1_score(y_test, y_pred)
+
+print("F1-Score:", f1_score_value)
+
+
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Assuming you've already trained your Logistic Regression model and made predictions (y_pred) on the test data
+# model is your Logistic Regression classifier, x_test is the test data, and y_test is the true labels
+
+# Generate the confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# Create a heatmap for visualization
+sns.heatmap(cm, annot=True, fmt='g', xticklabels=['NEGATIVE', 'POSITIVE'], yticklabels=['NEGATIVE', 'POSITIVE'])
+plt.ylabel('Actual', fontsize=13)
+plt.xlabel('Predicted', fontsize=13)
+plt.title('Confusion Matrix', fontsize=17)
+plt.show()
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_curve, roc_auc_score
+import matplotlib.pyplot as plt
+
+# Assuming you have already trained the logistic regression model
+# If not, you can retrain it with the following code:
+
+# model = LogisticRegression()
+# model.fit(x_train, y_train)
+
+# Get the predicted probabilities for the positive class (class 1)
+y_pred_proba = model.predict_proba(x_test)[:, 1]
+
+# Calculate the ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+
+# Calculate the AUC (Area Under the Curve)
+roc_auc = roc_auc_score(y_test, y_pred_proba)
+
+# Plot the ROC curve
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (area = {roc_auc:.2f})')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc='lower right')
+plt.show()
+
+#RANDOM FOREST
+#Train the model
+from sklearn.ensemble import RandomForestRegressor
+model = RandomForestRegressor(n_estimators=1000)
+#Fit
+model.fit(x_train, y_train)
+y_pred = model.predict(x_test)
+#Score/Accuracy
+acc_randomforest=model.score(x_test, y_test)*100
+acc_randomforest
+
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Assuming you have your data in a variable 'data'
+# Replace 'data' with your actual dataset
+
+# Specify the number of clusters (k)
+k = 3  # You can adjust the number of clusters as needed
+
+# Create a K-Means model
+kmeans = KMeans(n_clusters=k, random_state=0)
+
+# Fit the model to your data
+kmeans.fit(data)
+
+# Get cluster labels
+cluster_labels = kmeans.labels_
+
+# Get cluster centers
+cluster_centers = kmeans.cluster_centers_
+
+# Visualization (if your data is 2D)
+plt.scatter(data[:, 0], data[:, 1], c=cluster_labels, cmap='viridis')
+plt.scatter(cluster_centers[:, 0], cluster_centers[:, 1], c='red', marker='x', s=200)
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.title('K-Means Clustering')
+plt.show()
+
+# Assuming you've already trained your Random Forest model and made predictions (y_pred) on the test data
+# model is your Random Forest classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the accuracy
+accuracy = model.score(x_test, y_test)
+
+print("Accuracy:", accuracy)
+
+from sklearn.metrics import precision_score
+
+# Assuming you've already trained your Random Forest model and made predictions (y_pred) on the test data
+# model is your Random Forest classifier, x_test is the test data, and y_test is the true labels
+
+
+precision = precision_score(y_test, y_pred)
+print("Precision :", precision)
+
+from sklearn.metrics import recall_score
+
+# Assuming you've already trained your Random Forest model and made predictions (y_pred) on the test data
+# model is your Random Forest classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the recall (sensitivity)
+recall = recall_score(y_test, y_pred)
+
+print("Recall (Sensitivity):", recall)
+
+from sklearn.metrics import f1_score
+
+# Assuming you've already trained your Random Forest model and made predictions (y_pred) on the test data
+# model is your Random Forest classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the F1-score
+f1_score_value = f1_score(y_test, y_pred)
+
+print("F1-Score:", f1_score_value)
+
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Assuming you've already trained your SVM model and made predictions (y_pred) on the test data
+# clf is the SVM classifier, x_test is the test data, and y_test is the true labels
+
+# Generate the confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# Create a heatmap for visualization
+sns.heatmap(cm, annot=True, fmt='g', xticklabels=['NEGATIVE', 'POSITIVE'], yticklabels=['NEGATIVE', 'POSITIVE'])
+plt.ylabel('Actual', fontsize=13)
+plt.xlabel('Predicted', fontsize=13)
+plt.title('Confusion Matrix', fontsize=17)
+plt.show()
+
+DECISION TREE CLASSIFIER
+from sklearn import tree
+t = tree.DecisionTreeClassifier()
+t.fit(x_train,y_train)
+y_pred = t.predict(x_test)
+#Score/Accuracy
+acc_decisiontree=t.score(x_test, y_test)*100
+acc_decisiontree
+
+from sklearn.tree import DecisionTreeClassifier
+
+# Assuming you've already trained your Decision Tree model and made predictions (y_pred) on the test data
+# t is your Decision Tree classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the accuracy
+accuracy = t.score(x_test, y_test)
+
+print("Accuracy:", accuracy)
+
+from sklearn.metrics import precision_score
+
+# Assuming you've already trained your Decision Tree model and made predictions (y_pred) on the test data
+# t is your Decision Tree classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the precision
+precision = precision_score(y_test, y_pred)
+
+print("Precision:", precision)
+
+from sklearn.metrics import recall_score
+
+# Assuming you've already trained your Decision Tree model and made predictions (y_pred) on the test data
+# t is your Decision Tree classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the recall (sensitivity)
+recall = recall_score(y_test, y_pred)
+
+print("Recall (Sensitivity):", recall)
+
+from sklearn.metrics import f1_score
+
+# Assuming you've already trained your Decision Tree model and made predictions (y_pred) on the test data
+# t is your Decision Tree classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the F1-score
+f1_score_value = f1_score(y_test, y_pred)
+
+print("F1-Score:", f1_score_value)
+
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Assuming you've already trained your Decision Tree model and made predictions (y_pred) on the test data
+# t is your Decision Tree classifier, x_test is the test data, and y_test is the true labels
+
+# Generate the confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# Create a heatmap for visualization
+sns.heatmap(cm, annot=True, fmt='g', xticklabels=['NEGATIVE', 'POSITIVE'], yticklabels=['NEGATIVE', 'POSITIVE'])
+plt.ylabel('Actual', fontsize=13)
+plt.xlabel('Predicted', fontsize=13)
+plt.title('Confusion Matrix', fontsize=17)
+plt.show()
+
+
+#SVM
+#Import svm model
+from sklearn import svm
+#Create a svm Classifier
+clf = svm.SVC(kernel='linear') # Linear Kernel
+#Train the model using the training sets
+clf.fit(x_train, y_train)
+#Predict the response for test dataset
+y_pred = clf.predict(x_test)
+#Score/Accuracy
+acc_svc=clf.score(x_test, y_test)*100
+acc_svc
+
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy   :", accuracy)
+
+from sklearn.metrics import precision_score
+
+# Assuming you've already trained your SVM model and made predictions (y_pred) on the test data
+# clf is the SVM classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the precision
+precision = precision_score(y_test, y_pred)
+
+print("Precision:", precision)
+
+from sklearn.metrics import recall_score
+
+# Assuming you've already trained your SVM model and made predictions (y_pred) on the test data
+# clf is the SVM classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the recall (sensitivity)
+recall = recall_score(y_test, y_pred)
+
+print("Recall (Sensitivity):", recall)
+
+
+from sklearn.metrics import f1_score
+
+# Assuming you've already trained your SVM model and made predictions (y_pred) on the test data
+# clf is the SVM classifier, x_test is the test data, and y_test is the true labels
+
+# Calculate the F1-score
+f1_score_value = f1_score(y_test, y_pred)
+
+print("F1-Score:", f1_score_value)
+
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Assuming you've already trained your SVM model and made predictions (y_pred) on the test data
+# clf is the SVM classifier, x_test is the test data, and y_test is the true labels
+
+# Generate the confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# Create a heatmap for visualization
+sns.heatmap(cm, annot=True, fmt='g', xticklabels=['NEGATIVE', 'POSITIVE'], yticklabels=['NEGATIVE', 'POSITIVE'])
+plt.ylabel('Actual', fontsize=13)
+plt.xlabel('Predicted', fontsize=13)
+plt.title('Confusion Matrix', fontsize=17)
+plt.show()
+
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+cm = confusion_matrix(y_test,y_pred)
+
+sns.heatmap(cm,
+            annot=True,
+            fmt='g',
+            xticklabels=['POSITIVE', 'NEGITIVE'],
+            yticklabels=['POSITIVE', 'NEGITIVE'])
+plt.ylabel('Prediction',fontsize=13)
+plt.xlabel('Actual',fontsize=13)
+plt.title('Confusion Matrix',fontsize=17)
+plt.show()
+
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy   :", accuracy)
+precision = precision_score(y_test, y_pred)
+print("Precision :", precision)
+recall = recall_score(y_test, y_pred)
+print("Recall    :", recall)
+F1_score = f1_score(y_test, y_pred)
+print("F1-score  :", F1_score)
+
+models = pd.DataFrame({
+    'Model': ['Support Vector Machines', 'Logistic Regression',
+              'Random Forest',
+              'Decision Tree'],
+    'Score': [acc_svc, acc_logreg,
+              acc_randomforest, acc_decisiontree
+              ]})
+models.sort_values(by='Score', ascending=False)
+
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.cluster import KMeans
+import numpy as np
+
+# Train the model
+model = RandomForestRegressor(n_estimators=1000)
+model.fit(x_train, y_train)
+y_pred = model.predict(x_test)
+
+# Calculate the R-squared (coefficient of determination) for model accuracy
+r2 = r2_score(y_test, y_pred) * 100
+
+# Combine the actual and predicted values into a single array
+data = np.vstack((y_test, y_pred)).T
+
+# Use K-Means clustering to create two clusters
+kmeans = KMeans(n_clusters=2, random_state=0).fit(data)
+
+# Separate the data into two clusters based on the K-Means results
+cluster1 = data[kmeans.labels_ == 0]
+cluster2 = data[kmeans.labels_ == 1]
+
+# Create a scatter plot to visualize the clustered results
+plt.figure(figsize=(10, 6))
+plt.scatter(cluster1[:, 0], cluster1[:, 1], label='Cluster 1', color='blue')
+plt.scatter(cluster2[:, 0], cluster2[:, 1], label='Cluster 2', color='green')
+plt.title('Random Forest Regression - Clusters of Predicted vs. Actual')
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+print(f'R-squared (Accuracy): {r2:.2f}%')
+
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_curve, roc_auc_score
+import matplotlib.pyplot as plt
+
+# Assuming you have already trained the logistic regression model
+# If not, you can retrain it with the following code:
+
+# model = LogisticRegression()
+# model.fit(x_train, y_train)
+
+# Get the predicted probabilities for the positive class (class 1)
+y_pred_binary = model.predict(x_test)
+y_pred_proba_positive_class = y_pred_binary[:, 1]
+
+# Calculate the ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba_positive_class)
+
+# Calculate the AUC (Area Under the Curve)
+roc_auc = roc_auc_score(y_test, y_pred_proba_positive_class)
+
+# Plot the ROC curve
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (area = {roc_auc:.2f})')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc='lower right')
+plt.show()
+
+#DBSCAN
+from sklearn.cluster import DBSCAN
+import matplotlib.pyplot as plt
+
+# Assuming you have your data in a variable 'data'
+# Replace 'data' with your actual dataset
+
+# Create a DBSCAN model
+dbscan = DBSCAN(eps=0.5, min_samples=5)  # You may need to adjust these hyperparameters
+
+# Fit the model to your data
+dbscan.fit(data)
+
+# Get cluster labels
+cluster_labels = dbscan.labels_
+
+# Number of clusters in labels, ignoring noise if present.
+n_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0)
+n_noise = list(cluster_labels).count(-1)
+
+print(f'Estimated number of clusters: {n_clusters}')
+print(f'Estimated number of noise points: {n_noise}')
+
+# Visualization (if your data is 2D)
+plt.scatter(data[:, 0], data[:, 1], c=cluster_labels, cmap='viridis')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.title('DBSCAN Clustering')
+plt.show()
+
+#KMEANS
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Assuming you have your data in a variable 'data'
+# Replace 'data' with your actual dataset
+
+# Create a K-Means model with a specified number of clusters (k)
+k = 3  # You can adjust the number of clusters as needed
+kmeans = KMeans(n_clusters=k)
+
+# Fit the model to your data
+kmeans.fit(data)
+
+# Get cluster labels
+cluster_labels = kmeans.labels_
+
+# Get cluster centroids
+cluster_centers = kmeans.cluster_centers_
+
+# Visualization (if your data is 2D)
+plt.scatter(data[:, 0], data[:, 1], c=cluster_labels, cmap='viridis')
+plt.scatter(cluster_centers[:, 0], cluster_centers[:, 1], c='red', marker='x', s=200)
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.title('K-Means Clustering')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
